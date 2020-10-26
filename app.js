@@ -1,15 +1,15 @@
 const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
+const Render = require("./lib/htmlRenderer");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
+const util = require("util");
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
-const outputPath = path.join(OUTPUT_DIR, "team.html");
 
-const render = require("./lib/htmlRenderer");
-
+const writeFileAsync = util.promisify(fs.writeFile);
 
 class Generator {
     constructor() {
@@ -17,6 +17,7 @@ class Generator {
         this.id = 0;
     }
 
+    // auto generate ids
     getId() {
         this.id++;
         return this.id;
@@ -25,13 +26,14 @@ class Generator {
     // called from main function to build team
     buildTeam() {
         this.getManagerDetails().then(() => {
-            console.log("please enter each of your team members...");
+            console.log("Please enter each of your team members...");
             this.getMemberDetails().then(() => {
                 this.askForMember();
             })
         })
     }
 
+    // uses inquirer to get the details of the engineer/intern - does both
     getMemberDetails() {
         return inquirer
             .prompt([
@@ -73,11 +75,12 @@ class Generator {
 
                 switch (answer.mem_type) {
                     case "Engineer":
-                        // create the Engineer
+                        // create and add the Engineer
                         member = new Engineer(answer.mem_name, this.getId(), answer.mem_email, answer.mem_github);
                         this.team.push(member);
                         break;
                     case "Intern":
+                        // create and add the intern 
                         member = new Intern(answer.mem_name, this.getId(), answer.mem_email, answer.mem_school);
                         this.team.push(member);
                         break;
@@ -87,8 +90,9 @@ class Generator {
             });
     }
 
+    // uses inquirer to get the details of the manager
     getManagerDetails() {
-        console.log('getManagerDetails');
+        console.log("Please enter the Manager's Details");
 
         return inquirer
             .prompt([
@@ -114,6 +118,7 @@ class Generator {
             .then((answer) => {
                 // create the manager
                 let manager = new Manager(answer.man_name, this.getId(), answer.man_email, answer.man_office);
+                //  and add to the team
                 this.team.push(manager);
             });
     }
@@ -130,64 +135,51 @@ class Generator {
             ])
             .then(answer => {
                 if (answer.choice) {
+                    // recursively ask for team members
                     this.getMemberDetails().then(() => {
                         this.askForMember();
                     })
                 } else {
-                    console.log('Finished entering members:\n' + JSON.stringify(this.team));
-
-                    this.processMembers();
+                    this.saveHTML();
                 }
             });
     }
 
-    // Logs goodbye and exits the node app
-    processMembers() {
-        // user has finished entering team so display it
+    // generate and save the html once the user has finished entering team
+    saveHTML() {
+        // use provided function to generate the html
+        let teamHTML = Render(this.team);
 
-        // load the files into a string (for each of manager, engineer and intern)
+        // before writing ensure the output directory exists
+        let bFolderExists = fs.existsSync(OUTPUT_DIR);
+        if (!bFolderExists) {
+            // doesn't exist so create        
+            bFolderExists = (fs.mkdirSync(OUTPUT_DIR, { recursive: true }) !== "");
+        }
 
-        // for each member in team, replace the placeholders in the html with the values
-        // and add it to the team html str
-
-        // replace the {{ team }} placeholder with the gnerated str of all team members
-
-        // and finally save and open the main html
-
-        console.log("\nGoodbye!");
-        process.exit(0);
+        if (bFolderExists) {
+            // and finally save the html
+            writeFileAsync(`${OUTPUT_DIR}/team.html`, teamHTML)
+                .then(() => {
+                    console.log(`Successfully created team webpage at : ${OUTPUT_DIR}/team.html`);
+                    process.exit(0);
+                })
+                .catch(() => {
+                    console.log(`Unable to save webpage file at : ${OUTPUT_DIR}/team.html`);
+                    process.exit(0);
+                });
+        } else {
+            console.log('Unable to create output directory. The team.html file was not saved.');
+        }
     }
 }
 
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
-
 function init() {
     console.log("Welcome to the Team Generator app!");
-    console.log("As manager, please provide your team's information.");
+    console.log("Please provide information for each team member. \nA Manager is required, then multiple Engineers and Interns can be added.");
 
-    teamGenerator = new Generator();
+    let teamGenerator = new Generator();
     teamGenerator.buildTeam();
 }
-
-// After the user has input all employees desired, call the `render` function (required
-// above) and pass in an array containing all employee objects; the `render` function will
-// generate and return a block of HTML including templated divs for each employee!
-
-// After you have your html, you're now ready to create an HTML file using the HTML
-// returned from the `render` function. Now write it to a file named `team.html` in the
-// `output` folder. You can use the variable `outputPath` above target this location.
-// Hint: you may need to check if the `output` folder exists and create it if it
-// does not.
-
-// HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
-
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work! ```
 
 init();
