@@ -1,0 +1,20 @@
+/** @format */
+
+.team-heading {
+  background-color: red;
+  color: white;
+}
+
+.card-header {
+  background-color: blue;
+  color: white;
+}
+
+.card-body {
+  background-color: whitesmoke;
+}
+
+.employee-card {
+  margin: 10px;
+  box-shadow: 5px 5px lightgrey;
+}
