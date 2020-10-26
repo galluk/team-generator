@@ -175,8 +175,8 @@ class Generator {
 }
 
 function init() {
-    console.log("Welcome to the Team Generator app!");
-    console.log("Please provide information for each team member. \nA Manager is required, then multiple Engineers and Interns can be added.");
+    console.log("\nWelcome to the Team Generator app!");
+    console.log("Please provide information for each team member. Invalid input will not be accepted.\nA Manager is required, then multiple Engineers and Interns can be added.");
 
     let teamGenerator = new Generator();
     teamGenerator.buildTeam();
