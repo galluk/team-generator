@@ -17,8 +17,8 @@ The task was to then write a CLI app that used Inquirer to prompt the user to en
 
 #### Initial interface
 
-![Screenshot of team generator in action](https://github.com/galluk/team-generator/blob/master/assets/screenshot.jpg)
-![Screenshot of team generator output](https://github.com/galluk/team-generator/blob/master/assets/output.jpg)
+![Screenshot of team generator in action](./assets/screenshot.jpg)
+![Screenshot of team generator output](./assets/output.jpg)
 
 <hr>
 
@@ -28,7 +28,7 @@ GNU General Public License v3.0
 
 ### Link to the github Repo
 
-<a href="https://https://github.com/galluk/team-generator">Team Generator</a>
+<a href="https://github.com/galluk/team-generator">Team Generator</a>
 
 <hr>
 
