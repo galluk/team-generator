@@ -16,8 +16,10 @@ The task was to then write a CLI app that used Inquirer to prompt the user to en
 - [VScode](https://code.visualstudio.com/) - The editor of choice
 
 #### Initial interface
-
+CLI accepting user input:
 ![Screenshot of team generator in action](./assets/screenshot.jpg)
+
+Screenshot of the generated html:
 ![Screenshot of team generator output](./assets/output.jpg)
 
 <hr>
